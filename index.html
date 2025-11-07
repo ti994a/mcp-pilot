@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCPilot - MCP Server Manager</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/themes.css">
+    <link rel="stylesheet" href="styles/animations.css">
+</head>
+<body data-theme="light">
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1 class="app-title">MCPilot</h1>
+                <div class="header-controls">
+                    <button id="shortcuts-btn" class="icon-btn" title="Keyboard Shortcuts (?)">
+                        <span>⌨️</span>
+                    </button>
+                    <button id="theme-toggle" class="icon-btn" title="Toggle Theme (Ctrl+T)">
+                        <span class="theme-icon">🌙</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Statistics Bar -->
+        <section class="statistics-bar">
+            <div class="stat-item">
+                <span class="stat-label">Servers:</span>
+                <span class="stat-value">
+                    <span id="servers-enabled" class="stat-enabled">0</span> enabled,
+                    <span id="servers-disabled" class="stat-disabled">0</span> disabled
+                </span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Tools:</span>
+                <span class="stat-value" id="tools-total">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Q Context:</span>
+                <span class="stat-value" id="context-utilization">0%</span>
+            </div>
+        </section>
+
+        <!-- Action Bar -->
+        <section class="action-bar">
+            <div class="action-group">
+                <button id="refresh-btn" class="action-btn" title="Refresh Dashboard (Ctrl+R)">
+                    🔄 Refresh
+                </button>
+                <button id="refresh-descriptions-btn" class="action-btn" title="Refresh Descriptions">
+                    📝 Refresh Descriptions
+                </button>
+                <button id="export-btn" class="action-btn" title="Export MCP Config (Ctrl+E)">
+                    💾 MCP Export
+                </button>
+            </div>
+            <div class="action-group">
+                <button id="apply-config-btn" class="action-btn primary" title="Apply Configuration (Ctrl+A)">
+                    ✓ Apply Configuration
+                </button>
+                <button id="clear-context-btn" class="action-btn" title="Clear Q Context (Ctrl+L)">
+                    🗑️ Clear Q Context
+                </button>
+            </div>
+        </section>
+
+        <!-- Profile Bar -->
+        <section class="profile-bar">
+            <div class="profile-controls">
+                <label for="profile-select" class="profile-label">Profile:</label>
+                <select id="profile-select" class="profile-select">
+                    <option value="">None</option>
+                </select>
+                <button id="save-profile-btn" class="profile-btn" title="Save Profile (Ctrl+S)">
+                    💾 Save
+                </button>
+                <button id="delete-profile-btn" class="profile-btn" title="Delete Profile (Ctrl+D)" disabled>
+                    🗑️ Delete
+                </button>
+            </div>
+        </section>
+
+        <!-- Server List -->
+        <main class="server-list-container">
+            <div id="server-list" class="server-list">
+                <!-- Servers will be rendered here -->
+            </div>
+            <div id="empty-state" class="empty-state" style="display: none;">
+                <p>No MCP servers configured</p>
+                <p class="empty-state-hint">Add servers to ~/.aws/amazonq/mcp.json to get started</p>
+            </div>
+        </main>
+
+        <!-- Loading Overlay -->
+        <div id="loading-overlay" class="loading-overlay" style="display: none;">
+            <div class="loading-spinner"></div>
+            <p id="loading-message" class="loading-message">Loading...</p>
+        </div>
+
+        <!-- Notification Container -->
+        <div id="notification-container" class="notification-container"></div>
+
+        <!-- Keyboard Shortcuts Modal -->
+        <div id="shortcuts-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Keyboard Shortcuts</h2>
+                    <button class="modal-close" id="shortcuts-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <table class="shortcuts-table">
+                        <tr><td><kbd>Ctrl/Cmd + R</kbd></td><td>Refresh dashboard</td></tr>
+                        <tr><td><kbd>Ctrl/Cmd + E</kbd></td><td>Export configuration</td></tr>
+                        <tr><td><kbd>Ctrl/Cmd + T</kbd></td><td>Toggle theme</td></tr>
+                        <tr><td><kbd>Ctrl/Cmd + A</kbd></td><td>Apply configuration</td></tr>
+                        <tr><td><kbd>Ctrl/Cmd + L</kbd></td><td>Clear Q context</td></tr>
+                        <tr><td><kbd>Ctrl/Cmd + S</kbd></td><td>Save profile</td></tr>
+                        <tr><td><kbd>Ctrl/Cmd + D</kbd></td><td>Delete profile</td></tr>
+                        <tr><td><kbd>↑/↓</kbd></td><td>Navigate servers</td></tr>
+                        <tr><td><kbd>→</kbd></td><td>Expand server/tools</td></tr>
+                        <tr><td><kbd>←</kbd></td><td>Collapse server/tools</td></tr>
+                        <tr><td><kbd>Space</kbd></td><td>Toggle selected server</td></tr>
+                        <tr><td><kbd>?</kbd></td><td>Show keyboard shortcuts</td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Save Modal -->
+        <div id="profile-save-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Save Profile</h2>
+                    <button class="modal-close" id="profile-save-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="profile-save-form">
+                        <div class="form-group">
+                            <label for="profile-name">Profile Name *</label>
+                            <input type="text" id="profile-name" required maxlength="50">
+                        </div>
+                        <div class="form-group">
+                            <label for="profile-description">Description</label>
+                            <textarea id="profile-description" rows="3" maxlength="200"></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn-secondary" id="profile-save-cancel">Cancel</button>
+                            <button type="submit" class="btn-primary">Save Profile</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="scripts/app.js"></script>
+</body>
+</html>

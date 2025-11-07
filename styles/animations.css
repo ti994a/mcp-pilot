@@ -1,0 +1,214 @@
+/* Animations and Transitions */
+
+/* Smooth transitions for theme switching */
+body,
+.app-container,
+.header,
+.statistics-bar,
+.action-bar,
+.profile-bar,
+.server-item,
+.modal-content,
+.notification {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Button hover animations */
+.icon-btn,
+.action-btn,
+.profile-btn,
+.toggle-btn {
+    transition: all 0.15s ease;
+}
+
+/* Expand/collapse animations */
+.expand-icon {
+    transition: transform 0.2s ease;
+}
+
+.server-details,
+.tools-list {
+    animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Toggle button animation */
+.toggle-btn:active {
+    transform: scale(0.95);
+}
+
+/* Status indicator pulse for changes */
+.status-indicator {
+    transition: background-color 0.2s ease;
+}
+
+.status-indicator.changing {
+    animation: pulse 0.5s ease;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 0.8;
+    }
+}
+
+/* Notification slide-in animation */
+.notification {
+    animation: slideIn 0.25s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Notification slide-out animation */
+.notification.removing {
+    animation: slideOut 0.25s ease-in forwards;
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+/* Modal fade-in animation */
+.modal {
+    animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.modal-content {
+    animation: scaleIn 0.2s ease-out;
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Loading spinner animation */
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Hover effects */
+.server-header:hover,
+.tools-header:hover {
+    transition: background-color 0.15s ease;
+}
+
+/* Focus styles for keyboard navigation */
+.server-item:focus-within {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+}
+
+button:focus-visible,
+select:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+}
+
+/* Smooth scrolling */
+.server-list-container {
+    scroll-behavior: smooth;
+}
+
+/* Statistics value change animation */
+.stat-value {
+    transition: color 0.3s ease;
+}
+
+.stat-value.updating {
+    animation: highlight 0.5s ease;
+}
+
+@keyframes highlight {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.6;
+    }
+}
+
+/* Disabled state transition */
+.server-item.disabled {
+    transition: opacity 0.3s ease;
+}
+
+/* Profile dropdown animation */
+.profile-select {
+    transition: border-color 0.15s ease;
+}
+
+.profile-select:hover {
+    border-color: var(--accent-color);
+}
+
+/* Action button loading state */
+.action-btn.loading {
+    position: relative;
+    color: transparent;
+}
+
+.action-btn.loading::after {
+    content: "";
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: 50%;
+    left: 50%;
+    margin-left: -8px;
+    margin-top: -8px;
+    border: 2px solid currentColor;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+}

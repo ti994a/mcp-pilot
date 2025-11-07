@@ -1,0 +1,38 @@
+/* Theme Variables */
+
+/* Light Theme */
+[data-theme="light"] {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8f9fa;
+    --bg-hover: #e9ecef;
+    --text-primary: #1a1a1a;
+    --text-secondary: #6c757d;
+    --text-disabled: #adb5bd;
+    --accent-color: #0066cc;
+    --success-color: #28a745;
+    --error-color: #dc3545;
+    --border-color: #dee2e6;
+}
+
+/* Dark Theme */
+[data-theme="dark"] {
+    --bg-primary: #1a1a1a;
+    --bg-secondary: #2d2d2d;
+    --bg-hover: #3a3a3a;
+    --text-primary: #e0e0e0;
+    --text-secondary: #a0a0a0;
+    --text-disabled: #666666;
+    --accent-color: #4da6ff;
+    --success-color: #3ddc84;
+    --error-color: #ff6b6b;
+    --border-color: #404040;
+}
+
+/* Theme Icon */
+[data-theme="light"] .theme-icon::before {
+    content: "🌙";
+}
+
+[data-theme="dark"] .theme-icon::before {
+    content: "☀️";
+}
