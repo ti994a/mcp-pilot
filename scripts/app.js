@@ -46,7 +46,8 @@ class MCPilotApp {
             this.uiManager.showLoading('Loading configuration...');
             
             // Check if sample data exists, if not load it
-            if (!this.fileManager.hasSampleData()) {
+            const hasSample = await this.fileManager.hasSampleData();
+            if (!hasSample) {
                 await this.fileManager.loadSampleData();
             }
             

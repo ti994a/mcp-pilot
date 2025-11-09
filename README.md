@@ -24,7 +24,15 @@ A modern, responsive web-based dashboard for managing Amazon Q MCP (Model Contex
 ### Installation
 
 1. Clone or download this repository
-2. Open `index.html` in your web browser
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Start the server:
+   ```bash
+   npm start
+   ```
+4. Open your browser to `http://localhost:3000`
 
 ### First Run
 
@@ -103,10 +111,13 @@ mcpilot/
 
 ## Data Storage
 
-MCPilot uses browser localStorage for demo/development purposes. In production, it would read/write:
+MCPilot uses a Node.js server to read/write files to your local file system:
 
 - **MCP Config**: `~/.aws/amazonq/mcp.json`
 - **Metadata**: `~/.aws/amazonq/mcp-metadata.json`
+- **Exports**: `~/.aws/amazonq/exports/`
+
+The server automatically creates these directories if they don't exist.
 
 ### MCP Config Format
 

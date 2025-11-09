@@ -1,19 +1,12 @@
 /**
  * FileManager - Handles all file I/O operations
- * Note: This implementation uses the File System Access API for web browsers.
- * For Electron or Node.js environments, this would need to be adapted.
+ * Uses Node.js server API for file system access
  */
 
 export class FileManager {
     constructor() {
-        // Default file paths (can be overridden)
-        this.mcpConfigPath = '~/.aws/amazonq/mcp.json';
-        this.metadataPath = '~/.aws/amazonq/mcp-metadata.json';
-        this.exportDir = '~/.aws/amazonq/exports';
-        
-        // File handles for File System Access API
-        this.mcpConfigHandle = null;
-        this.metadataHandle = null;
+        // API base URL
+        this.apiBase = 'http://localhost:3000/api';
     }
 
     /**
@@ -22,16 +15,13 @@ export class FileManager {
      */
     async readMcpConfig() {
         try {
-            // For demo/development, try localStorage first
-            const stored = localStorage.getItem('mcp-config');
-            if (stored) {
-                const config = JSON.parse(stored);
-                this.validateMcpConfig(config);
-                return config;
+            const response = await fetch(`${this.apiBase}/mcp-config`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-
-            // If no stored config, return empty structure
-            return { mcpServers: {} };
+            const config = await response.json();
+            this.validateMcpConfig(config);
+            return config;
         } catch (error) {
             console.error('Error reading MCP config:', error);
             throw new Error(`Failed to read MCP configuration: ${error.message}`);
@@ -48,13 +38,20 @@ export class FileManager {
             // Validate before writing
             this.validateMcpConfig(config);
 
-            // Format JSON with proper indentation
-            const jsonString = JSON.stringify(config, null, 2);
+            const response = await fetch(`${this.apiBase}/mcp-config`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(config)
+            });
 
-            // For demo/development, use localStorage
-            localStorage.setItem('mcp-config', jsonString);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
 
-            console.log('MCP config saved successfully');
+            const result = await response.json();
+            console.log('MCP config saved successfully:', result.message);
         } catch (error) {
             console.error('Error writing MCP config:', error);
             throw new Error(`Failed to write MCP configuration: ${error.message}`);
@@ -67,14 +64,11 @@ export class FileManager {
      */
     async readMetadata() {
         try {
-            // For demo/development, try localStorage first
-            const stored = localStorage.getItem('mcp-metadata');
-            if (stored) {
-                return JSON.parse(stored);
+            const response = await fetch(`${this.apiBase}/metadata`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-
-            // Return default metadata structure
-            return this.createDefaultMetadata();
+            return await response.json();
         } catch (error) {
             console.error('Error reading metadata:', error);
             // Return default metadata on error
@@ -89,13 +83,20 @@ export class FileManager {
      */
     async writeMetadata(metadata) {
         try {
-            // Format JSON with proper indentation
-            const jsonString = JSON.stringify(metadata, null, 2);
+            const response = await fetch(`${this.apiBase}/metadata`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(metadata)
+            });
 
-            // For demo/development, use localStorage
-            localStorage.setItem('mcp-metadata', jsonString);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
 
-            console.log('Metadata saved successfully');
+            const result = await response.json();
+            console.log('Metadata saved successfully:', result.message);
         } catch (error) {
             console.error('Error writing metadata:', error);
             throw new Error(`Failed to write metadata: ${error.message}`);
@@ -108,24 +109,17 @@ export class FileManager {
      */
     async exportMcpConfig() {
         try {
-            const config = await this.readMcpConfig();
-            
-            // Generate timestamp filename
-            const now = new Date();
-            const timestamp = now.toISOString()
-                .replace(/:/g, '-')
-                .replace(/\..+/, '')
-                .replace('T', '-');
-            const filename = `mcp-${timestamp}.json`;
+            const response = await fetch(`${this.apiBase}/export`, {
+                method: 'POST'
+            });
 
-            // Format JSON
-            const jsonString = JSON.stringify(config, null, 2);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
 
-            // For demo/development, trigger download
-            this.downloadFile(jsonString, filename, 'application/json');
-
-            console.log(`MCP config exported as ${filename}`);
-            return filename;
+            const result = await response.json();
+            console.log(`MCP config exported as ${result.filename} to ${result.path}`);
+            return result.filename;
         } catch (error) {
             console.error('Error exporting MCP config:', error);
             throw new Error(`Failed to export MCP configuration: ${error.message}`);
@@ -188,132 +182,45 @@ export class FileManager {
         };
     }
 
-    /**
-     * Trigger file download in browser
-     * @param {string} content
-     * @param {string} filename
-     * @param {string} mimeType
-     */
-    downloadFile(content, filename, mimeType) {
-        const blob = new Blob([content], { type: mimeType });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = filename;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-    }
+
 
     /**
      * Load sample data for development/demo
      * @returns {Promise<void>}
      */
     async loadSampleData() {
-        const sampleConfig = {
-            mcpServers: {
-                filesystem: {
-                    command: 'npx',
-                    args: ['-y', '@modelcontextprotocol/server-filesystem', '/tmp'],
-                    env: {},
-                    disabled: false
-                },
-                git: {
-                    command: 'uvx',
-                    args: ['mcp-server-git', '--repository', '/path/to/repo'],
-                    disabled: true
-                },
-                database: {
-                    command: 'npx',
-                    args: ['database-mcp-server'],
-                    disabled: false
-                }
-            }
-        };
+        try {
+            const response = await fetch(`${this.apiBase}/load-sample`, {
+                method: 'POST'
+            });
 
-        const sampleMetadata = {
-            application: {
-                theme: 'light',
-                lastRefresh: new Date().toISOString(),
-                contextUtilization: 45,
-                activeProfile: null
-            },
-            servers: {
-                filesystem: {
-                    description: 'File system access server for reading and writing files',
-                    expanded: false,
-                    toolsExpanded: false,
-                    lastQueried: new Date().toISOString()
-                },
-                git: {
-                    description: 'Git repository operations including log, diff, and status',
-                    expanded: false,
-                    toolsExpanded: false,
-                    lastQueried: new Date().toISOString()
-                },
-                database: {
-                    description: 'Database query server for SQL operations',
-                    expanded: false,
-                    toolsExpanded: false,
-                    lastQueried: new Date().toISOString()
-                }
-            },
-            tools: {
-                filesystem: {
-                    read_file: { description: 'Read file contents from the filesystem' },
-                    write_file: { description: 'Write content to a file' },
-                    list_directory: { description: 'List contents of a directory' }
-                },
-                git: {
-                    git_log: { description: 'View commit history' },
-                    git_diff: { description: 'Show file differences' },
-                    git_status: { description: 'Show working tree status' }
-                },
-                database: {
-                    query: { description: 'Execute SQL query' },
-                    schema: { description: 'Get table schema information' },
-                    list_tables: { description: 'List all database tables' }
-                }
-            },
-            profiles: {
-                development: {
-                    description: 'Development environment with all tools',
-                    enabledServers: ['filesystem', 'git', 'database'],
-                    disabledServers: [],
-                    createdAt: new Date().toISOString(),
-                    lastUsed: null
-                },
-                minimal: {
-                    description: 'Minimal configuration for performance',
-                    enabledServers: ['filesystem'],
-                    disabledServers: ['git', 'database'],
-                    createdAt: new Date().toISOString(),
-                    lastUsed: null
-                }
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-        };
 
-        await this.writeMcpConfig(sampleConfig);
-        await this.writeMetadata(sampleMetadata);
-        
-        console.log('Sample data loaded successfully');
+            const result = await response.json();
+            console.log('Sample data loaded successfully:', result.message);
+        } catch (error) {
+            console.error('Error loading sample data:', error);
+            throw new Error(`Failed to load sample data: ${error.message}`);
+        }
     }
 
     /**
      * Check if sample data exists
-     * @returns {boolean}
+     * @returns {Promise<boolean>}
      */
-    hasSampleData() {
-        return localStorage.getItem('mcp-config') !== null;
-    }
-
-    /**
-     * Clear all stored data
-     */
-    clearAllData() {
-        localStorage.removeItem('mcp-config');
-        localStorage.removeItem('mcp-metadata');
-        console.log('All data cleared');
+    async hasSampleData() {
+        try {
+            const response = await fetch(`${this.apiBase}/check-files`);
+            if (!response.ok) {
+                return false;
+            }
+            const result = await response.json();
+            return result.mcpConfigExists;
+        } catch (error) {
+            console.error('Error checking for sample data:', error);
+            return false;
+        }
     }
 }
