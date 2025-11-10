@@ -75,10 +75,7 @@ class MCPilotApp {
     setupEventHandlers() {
         // Action buttons
         this.uiManager.elements.refreshBtn.addEventListener('click', () => this.handleRefresh());
-        this.uiManager.elements.refreshDescriptionsBtn.addEventListener('click', () => this.handleRefreshDescriptions());
         this.uiManager.elements.exportBtn.addEventListener('click', () => this.handleExport());
-        this.uiManager.elements.applyConfigBtn.addEventListener('click', () => this.handleApplyConfiguration());
-        this.uiManager.elements.clearContextBtn.addEventListener('click', () => this.handleClearContext());
         
         // Profile controls
         this.uiManager.elements.profileSelect.addEventListener('change', (e) => this.handleProfileSelect(e.target.value));
@@ -122,18 +119,7 @@ class MCPilotApp {
         this.uiManager.showNotification('Dashboard refreshed', 'success');
     }
 
-    /**
-     * Handle refresh descriptions
-     */
-    async handleRefreshDescriptions() {
-        this.uiManager.showLoading('Refreshing descriptions...');
-        
-        // Simulate querying servers (in real implementation, this would query actual MCP servers)
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        this.uiManager.hideLoading();
-        this.uiManager.showNotification('Descriptions refreshed', 'success');
-    }
+
 
     /**
      * Handle export
@@ -148,27 +134,7 @@ class MCPilotApp {
         }
     }
 
-    /**
-     * Handle apply configuration
-     */
-    async handleApplyConfiguration() {
-        try {
-            this.uiManager.showLoading('Applying configuration to Amazon Q...');
-            
-            // Save current state to files
-            await this.saveState();
-            
-            // Simulate Q integration (in real implementation, this would call Q API)
-            await new Promise(resolve => setTimeout(resolve, 1500));
-            
-            this.uiManager.hideLoading();
-            this.uiManager.showNotification('Configuration applied successfully', 'success');
-        } catch (error) {
-            this.uiManager.hideLoading();
-            console.error('Apply configuration error:', error);
-            this.uiManager.showNotification('Failed to apply configuration', 'error');
-        }
-    }
+
 
     /**
      * Handle clear context
@@ -177,12 +143,11 @@ class MCPilotApp {
         try {
             this.uiManager.showLoading('Clearing Q context...');
             
-            // Simulate Q integration
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            // Clear Q context
+            await this.qIntegration.clearContext();
             
-            // Update context utilization
-            this.stateManager.updateContextUtilization(0);
-            this.uiManager.renderStatistics();
+            // Update context utilization (should be 0 after clearing)
+            await this.updateContextUtilization();
             
             this.uiManager.hideLoading();
             this.uiManager.showNotification('Q context cleared', 'success');
@@ -190,6 +155,20 @@ class MCPilotApp {
             this.uiManager.hideLoading();
             console.error('Clear context error:', error);
             this.uiManager.showNotification('Failed to clear context', 'error');
+        }
+    }
+
+    /**
+     * Update context utilization from Q
+     */
+    async updateContextUtilization() {
+        try {
+            const percentage = await this.qIntegration.getContextUtilization();
+            this.stateManager.updateContextUtilization(percentage);
+            this.uiManager.renderStatistics();
+            await this.saveState();
+        } catch (error) {
+            console.error('Error updating context utilization:', error);
         }
     }
 
@@ -273,6 +252,13 @@ class MCPilotApp {
             return;
         }
         
+        // Don't trigger shortcuts when modals are open (except Escape)
+        const modalOpen = this.uiManager.elements.profileSaveModal.style.display === 'flex' ||
+                         this.uiManager.elements.shortcutsModal.style.display === 'flex';
+        if (modalOpen && e.key !== 'Escape') {
+            return;
+        }
+        
         const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
         const modifier = isMac ? e.metaKey : e.ctrlKey;
         
@@ -291,17 +277,12 @@ class MCPilotApp {
                     e.preventDefault();
                     this.uiManager.toggleTheme();
                     break;
-                case 'a':
-                    e.preventDefault();
-                    this.handleApplyConfiguration();
-                    break;
-                case 'l':
-                    e.preventDefault();
-                    this.handleClearContext();
-                    break;
                 case 's':
                     e.preventDefault();
-                    this.handleProfileSaveClick();
+                    // Only open modal if it's not already open
+                    if (this.uiManager.elements.profileSaveModal.style.display !== 'flex') {
+                        this.handleProfileSaveClick();
+                    }
                     break;
                 case 'd':
                     e.preventDefault();

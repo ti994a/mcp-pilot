@@ -73,7 +73,6 @@ app.get('/api/metadata', async (req, res) => {
                 application: {
                     theme: 'light',
                     lastRefresh: new Date().toISOString(),
-                    contextUtilization: 0,
                     activeProfile: null
                 },
                 servers: {},
@@ -104,7 +103,7 @@ app.post('/api/export', async (req, res) => {
     try {
         // Read current config
         const data = await fs.readFile(MCP_CONFIG_PATH, 'utf8');
-        
+
         // Generate timestamp filename
         const now = new Date();
         const timestamp = now.toISOString()
@@ -113,12 +112,12 @@ app.post('/api/export', async (req, res) => {
             .replace('T', '-');
         const filename = `mcp-${timestamp}.json`;
         const exportPath = path.join(EXPORT_DIR, filename);
-        
+
         // Write export file
         await fs.writeFile(exportPath, data, 'utf8');
-        
-        res.json({ 
-            success: true, 
+
+        res.json({
+            success: true,
             filename,
             path: exportPath
         });
@@ -156,7 +155,6 @@ app.post('/api/load-sample', async (req, res) => {
             application: {
                 theme: 'light',
                 lastRefresh: new Date().toISOString(),
-                contextUtilization: 45,
                 activeProfile: null
             },
             servers: {
@@ -233,12 +231,12 @@ app.get('/api/check-files', async (req, res) => {
         try {
             await fs.access(MCP_CONFIG_PATH);
             mcpExists = true;
-        } catch {}
+        } catch { }
 
         try {
             await fs.access(METADATA_PATH);
             metadataExists = true;
-        } catch {}
+        } catch { }
 
         res.json({
             mcpConfigExists: mcpExists,
@@ -255,7 +253,7 @@ app.get('/api/check-files', async (req, res) => {
 // Start server
 async function start() {
     await ensureDirectories();
-    
+
     app.listen(PORT, () => {
         console.log(`MCPilot server running on http://localhost:${PORT}`);
         console.log(`MCP config path: ${MCP_CONFIG_PATH}`);

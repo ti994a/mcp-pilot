@@ -4,15 +4,14 @@ A modern, responsive web-based dashboard for managing Amazon Q MCP (Model Contex
 
 ## Features
 
-- 📊 **Real-time Statistics** - View enabled/disabled servers, total tools, and Q context utilization
+- 📊 **Real-time Statistics** - View enabled/disabled servers and total tools
 - 🔄 **Server Management** - Enable/disable MCP servers with visual feedback
 - 📁 **Hierarchical Display** - Expandable/collapsible server and tool lists
 - 💾 **Configuration Profiles** - Save and quickly switch between server configurations
 - 🎨 **Light/Dark Theme** - Toggle between themes with persistent preference
 - ⌨️ **Keyboard Shortcuts** - Efficient navigation and actions
 - 💾 **Export Configuration** - Export mcp.json with timestamped backups
-- 🔄 **Refresh Descriptions** - Query servers for updated tool descriptions
-- 🚀 **Q Integration** - Apply configuration and clear Q context
+- 💾 **Auto-Save** - Changes automatically saved to configuration file
 
 ## Getting Started
 
@@ -69,10 +68,9 @@ On first run, MCPilot will automatically load sample data to demonstrate functio
 ### Actions
 
 - **Refresh**: Reload configuration from files
-- **Refresh Descriptions**: Query servers for updated tool descriptions
 - **MCP Export**: Export current configuration with timestamp
-- **Apply Configuration**: Apply changes to Amazon Q
-- **Clear Q Context**: Clear Amazon Q context window
+
+**Note**: Changes to server enabled/disabled states are automatically saved to `~/.aws/amazonq/mcp.json`. Restart Amazon Q to apply configuration changes.
 
 ### Keyboard Shortcuts
 
@@ -81,8 +79,6 @@ On first run, MCPilot will automatically load sample data to demonstrate functio
 | `Ctrl/Cmd + R` | Refresh dashboard |
 | `Ctrl/Cmd + E` | Export configuration |
 | `Ctrl/Cmd + T` | Toggle theme |
-| `Ctrl/Cmd + A` | Apply configuration |
-| `Ctrl/Cmd + L` | Clear Q context |
 | `Ctrl/Cmd + S` | Save profile |
 | `Ctrl/Cmd + D` | Delete profile |
 | `↑/↓` | Navigate servers |

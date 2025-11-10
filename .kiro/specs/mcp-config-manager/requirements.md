@@ -2,7 +2,7 @@
 
 ## Introduction
 
-MCPilot is a modern, responsive web-based dashboard for managing Amazon Q MCP (Model Context Protocol) servers and their tools via a single-page browser application. The dashboard runs in mainstream browsers that support JavaScript and displays MCP servers and corresponding tools in an expandable/collapsible hierarchical list ordered alphabetically. Users can view and enable/disable servers (but cannot add or delete servers), save configuration profiles for quick switching between server sets, with servers configured in ~/.aws/amazonq/mcp.json and all metadata stored in a separate JSON file. The interface features a clean, intuitive design with real-time statistics (servers enabled/disabled, total tools, Q context window utilization), status indicators, quick actions, keyboard shortcuts, and integration with Amazon Q for applying configuration changes and clearing context.
+MCPilot is a modern, responsive web-based dashboard for managing Amazon Q MCP (Model Context Protocol) servers and their tools via a single-page browser application. The dashboard runs in mainstream browsers that support JavaScript and displays MCP servers and corresponding tools in an expandable/collapsible hierarchical list ordered alphabetically. Users can view and enable/disable servers (but cannot add or delete servers), save configuration profiles for quick switching between server sets, with servers configured in ~/.aws/amazonq/mcp.json and all metadata stored in a separate JSON file. The interface features a clean, intuitive design with real-time statistics (servers enabled/disabled, total tools), status indicators, quick actions, and keyboard shortcuts. Changes are automatically saved to the configuration file.
 
 ## Requirements
 
@@ -51,15 +51,12 @@ MCPilot is a modern, responsive web-based dashboard for managing Amazon Q MCP (M
 
 1. WHEN the application loads THEN the system SHALL read all application, server, and tool metadata from a separate JSON metadata file
 2. WHEN displaying servers and tools THEN the system SHALL show their descriptions from the metadata file
-3. WHEN the user clicks a "Refresh Descriptions" button THEN the system SHALL query each MCP server to retrieve updated server and tool descriptions
-4. WHEN the system queries MCP servers THEN the system SHALL update the metadata file with the retrieved descriptions
-5. WHEN the system queries MCP servers THEN the system SHALL provide visual feedback indicating the refresh is in progress
-6. IF a server or tool does not have a description THEN the system SHALL display a default message or leave the description empty
-7. WHEN the system stores metadata THEN the system SHALL include application-level settings, server metadata, and tool metadata in the same JSON file
+3. IF a server or tool does not have a description THEN the system SHALL display a default message or leave the description empty
+4. WHEN the system stores metadata THEN the system SHALL include application-level settings, server metadata, and tool metadata in the same JSON file
 
 ### Requirement 4: Dashboard Summary Statistics
 
-**User Story:** As a user, I want to see summary statistics at the top of the dashboard, so that I can quickly understand the overall state of my MCP configuration and Q context usage.
+**User Story:** As a user, I want to see summary statistics at the top of the dashboard, so that I can quickly understand the overall state of my MCP configuration.
 
 #### Acceptance Criteria
 
@@ -67,8 +64,7 @@ MCPilot is a modern, responsive web-based dashboard for managing Amazon Q MCP (M
 2. WHEN displaying summary statistics THEN the system SHALL show the number of servers enabled
 3. WHEN displaying summary statistics THEN the system SHALL show the number of servers disabled
 4. WHEN displaying summary statistics THEN the system SHALL show the total number of tools across all servers
-5. WHEN displaying summary statistics THEN the system SHALL show the percent utilization of the Q context window
-6. WHEN any server is toggled THEN the system SHALL update the summary statistics in real-time
+5. WHEN any server is toggled THEN the system SHALL update the summary statistics in real-time
 
 ### Requirement 5: Dashboard Refresh and Export
 
@@ -83,19 +79,9 @@ MCPilot is a modern, responsive web-based dashboard for managing Amazon Q MCP (M
 5. WHEN the export is complete THEN the system SHALL provide visual feedback indicating success
 6. WHEN the refresh is complete THEN the system SHALL provide visual feedback indicating the dashboard has been updated
 
-### Requirement 6: Amazon Q Integration
 
-**User Story:** As a user, I want to apply configuration changes to Amazon Q and clear the Q context, so that I can ensure Q is using my current configuration.
 
-#### Acceptance Criteria
-
-1. WHEN the user clicks the "Apply Configuration" button THEN the system SHALL trigger Amazon Q to reload servers and tools based on the current mcp.json configuration
-2. WHEN the user clicks the "Clear Q Context" button THEN the system SHALL clear the Amazon Q context window
-3. WHEN the user applies configuration changes THEN the system SHALL provide visual feedback indicating the operation is in progress
-4. WHEN the user clears the Q context THEN the system SHALL provide visual feedback indicating the operation is complete
-5. WHEN configuration is applied successfully THEN the system SHALL display a success message
-
-### Requirement 7: File Persistence and Error Handling
+### Requirement 6: File Persistence and Error Handling
 
 **User Story:** As a user, I want the application to safely read and write the mcp.json and metadata files, so that my configurations are preserved and I'm notified of any errors.
 
@@ -109,7 +95,7 @@ MCPilot is a modern, responsive web-based dashboard for managing Amazon Q MCP (M
 6. WHEN the system writes to the mcp.json file THEN the system SHALL maintain the structure with "mcpServers" as the root object
 7. WHEN the system modifies server enabled/disabled state THEN the system SHALL only update the "disabled" field without adding or removing servers from mcp.json
 
-### Requirement 8: User Interface Responsiveness and Theme Support
+### Requirement 7: User Interface Responsiveness and Theme Support
 
 **User Story:** As a user, I want the interface to be simple, responsive, and support both light and dark modes, so that I can efficiently manage my MCP server configurations in my preferred visual theme.
 
@@ -124,7 +110,7 @@ MCPilot is a modern, responsive web-based dashboard for managing Amazon Q MCP (M
 7. WHEN the dashboard is displayed in dark mode THEN the system SHALL use appropriate colors for readability and visual comfort
 8. WHEN the dashboard is displayed in light mode THEN the system SHALL use appropriate colors for readability and visual comfort
 
-### Requirement 9: Configuration Profiles
+### Requirement 8: Configuration Profiles
 
 **User Story:** As a user, I want to save and quickly switch between different server configuration profiles, so that I can efficiently manage different sets of enabled/disabled servers for different use cases.
 
@@ -142,7 +128,7 @@ MCPilot is a modern, responsive web-based dashboard for managing Amazon Q MCP (M
 10. WHEN the application loads THEN the system SHALL display the active profile in the dropdown if one exists
 11. WHEN no profile is active THEN the system SHALL display "None" in the profile dropdown
 
-### Requirement 10: Keyboard Shortcuts
+### Requirement 9: Keyboard Shortcuts
 
 **User Story:** As a user, I want to use keyboard shortcuts for common actions, so that I can manage servers more efficiently without relying solely on mouse interactions.
 

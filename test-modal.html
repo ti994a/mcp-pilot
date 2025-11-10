@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Modal Input</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 400px;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            margin: 10px 0;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+        }
+        .info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="info">
+        <h2>Modal Input Test</h2>
+        <p>This tests if you can type in the modal inputs.</p>
+        <p><strong>Try:</strong></p>
+        <ul>
+            <li>Click "Open Modal" button</li>
+            <li>Try typing in the input fields</li>
+            <li>Try pressing Ctrl+S (should not close/reopen modal)</li>
+            <li>Press Escape to close</li>
+        </ul>
+    </div>
+
+    <button onclick="openModal()">Open Modal</button>
+    <p id="status"></p>
+
+    <div id="testModal" class="modal">
+        <div class="modal-content">
+            <h3>Test Profile Save</h3>
+            <form onsubmit="handleSubmit(event)">
+                <label>Profile Name:</label>
+                <input type="text" id="profileName" placeholder="Type here..." autofocus>
+                
+                <label>Description:</label>
+                <textarea id="profileDesc" rows="3" placeholder="Type description..."></textarea>
+                
+                <div>
+                    <button type="button" onclick="closeModal()">Cancel</button>
+                    <button type="submit">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const modal = document.getElementById('testModal');
+        const status = document.getElementById('status');
+
+        function openModal() {
+            modal.style.display = 'flex';
+            document.getElementById('profileName').focus();
+            status.textContent = 'Modal opened - try typing!';
+        }
+
+        function closeModal() {
+            modal.style.display = 'none';
+            status.textContent = 'Modal closed';
+        }
+
+        function handleSubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('profileName').value;
+            const desc = document.getElementById('profileDesc').value;
+            status.textContent = `Saved: ${name} - ${desc}`;
+            closeModal();
+        }
+
+        // Keyboard handler similar to MCPilot
+        document.addEventListener('keydown', (e) => {
+            // Don't trigger shortcuts when typing in inputs
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+                console.log('Input detected, skipping shortcut');
+                return;
+            }
+
+            // Don't trigger shortcuts when modal is open (except Escape)
+            const modalOpen = modal.style.display === 'flex';
+            if (modalOpen && e.key !== 'Escape') {
+                console.log('Modal open, skipping shortcut');
+                return;
+            }
+
+            const modifier = e.ctrlKey || e.metaKey;
+
+            if (modifier && e.key.toLowerCase() === 's') {
+                e.preventDefault();
+                console.log('Ctrl+S pressed');
+                if (modal.style.display !== 'flex') {
+                    openModal();
+                } else {
+                    console.log('Modal already open, ignoring');
+                }
+            }
+
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>

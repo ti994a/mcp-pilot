@@ -19,14 +19,10 @@ export class UIManager {
             serversEnabled: document.getElementById('servers-enabled'),
             serversDisabled: document.getElementById('servers-disabled'),
             toolsTotal: document.getElementById('tools-total'),
-            contextUtilization: document.getElementById('context-utilization'),
             
             // Actions
             refreshBtn: document.getElementById('refresh-btn'),
-            refreshDescriptionsBtn: document.getElementById('refresh-descriptions-btn'),
             exportBtn: document.getElementById('export-btn'),
-            applyConfigBtn: document.getElementById('apply-config-btn'),
-            clearContextBtn: document.getElementById('clear-context-btn'),
             
             // Profile
             profileSelect: document.getElementById('profile-select'),
@@ -105,11 +101,10 @@ export class UIManager {
         this.elements.serversEnabled.textContent = stats.enabled;
         this.elements.serversDisabled.textContent = stats.disabled;
         this.elements.toolsTotal.textContent = stats.totalTools;
-        this.elements.contextUtilization.textContent = `${stats.contextUtilization}%`;
         
         // Add update animation
         [this.elements.serversEnabled, this.elements.serversDisabled, 
-         this.elements.toolsTotal, this.elements.contextUtilization].forEach(el => {
+         this.elements.toolsTotal].forEach(el => {
             el.classList.add('updating');
             setTimeout(() => el.classList.remove('updating'), 500);
         });
@@ -169,11 +164,13 @@ export class UIManager {
         serverName.className = 'server-name';
         serverName.textContent = server.name;
         
-        // Toggle button
-        const toggleBtn = document.createElement('button');
-        toggleBtn.className = 'toggle-btn';
-        toggleBtn.textContent = 'Toggle';
-        toggleBtn.addEventListener('click', (e) => {
+        // Toggle switch
+        const toggleSwitch = document.createElement('button');
+        toggleSwitch.className = `toggle-switch ${server.isEnabled() ? 'enabled' : ''}`;
+        toggleSwitch.setAttribute('aria-label', `Toggle ${server.name}`);
+        toggleSwitch.setAttribute('role', 'switch');
+        toggleSwitch.setAttribute('aria-checked', server.isEnabled().toString());
+        toggleSwitch.addEventListener('click', (e) => {
             e.stopPropagation();
             this.handleServerToggle(server.name);
         });
@@ -181,7 +178,7 @@ export class UIManager {
         header.appendChild(expandIcon);
         header.appendChild(statusIndicator);
         header.appendChild(serverName);
-        header.appendChild(toggleBtn);
+        header.appendChild(toggleSwitch);
         
         header.addEventListener('click', () => {
             this.handleServerExpand(server.name);

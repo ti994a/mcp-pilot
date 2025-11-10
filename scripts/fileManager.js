@@ -173,7 +173,6 @@ export class FileManager {
             application: {
                 theme: 'light',
                 lastRefresh: new Date().toISOString(),
-                contextUtilization: 0,
                 activeProfile: null
             },
             servers: {},

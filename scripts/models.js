@@ -177,7 +177,6 @@ export class AppState {
         this.profiles = new Map();
         this.metadata = null;
         this.theme = 'light';
-        this.contextUtilization = 0;
         this.activeProfile = null;
     }
 
@@ -197,8 +196,7 @@ export class AppState {
             total,
             enabled,
             disabled,
-            totalTools,
-            contextUtilization: this.contextUtilization
+            totalTools
         };
     }
 

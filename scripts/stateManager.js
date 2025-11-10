@@ -22,7 +22,6 @@ export class StateManager {
         // Load application settings
         if (metadata.application) {
             this.state.theme = metadata.application.theme || 'light';
-            this.state.contextUtilization = metadata.application.contextUtilization || 0;
             this.state.activeProfile = metadata.application.activeProfile || null;
         }
 
@@ -133,17 +132,7 @@ export class StateManager {
         this.notifyListeners('theme-change', { theme });
     }
 
-    /**
-     * Update context utilization
-     * @param {number} percentage
-     */
-    updateContextUtilization(percentage) {
-        this.state.contextUtilization = percentage;
-        if (this.state.metadata?.application) {
-            this.state.metadata.application.contextUtilization = percentage;
-        }
-        this.notifyListeners('context-update', { percentage });
-    }
+
 
     /**
      * Apply a profile
@@ -320,7 +309,6 @@ export class StateManager {
             application: {
                 theme: this.state.theme,
                 lastRefresh: new Date().toISOString(),
-                contextUtilization: this.state.contextUtilization,
                 activeProfile: this.state.activeProfile
             },
             servers: {},
